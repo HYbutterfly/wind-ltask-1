@@ -32,6 +32,11 @@ local function remove_client(client)
     end
 end
 
+local function close_server()
+    for _,sock in ipairs(sock_tab) do
+        sock:close()
+    end
+end
 
 
 print("Gateway start, Listen on 8888")
@@ -60,4 +65,5 @@ while not quit do
         dispatch_messages()
     end
 end
+close_server()
 print "Gateway quit"
