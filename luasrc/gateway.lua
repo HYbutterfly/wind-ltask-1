@@ -34,7 +34,7 @@ end
 
 
 
-print("Gateway start")
+print("Gateway start, Listen on 8888")
 while not quit do
     local recvt = socket.select(sock_tab, nil, 0.1)
     if #recvt > 0 then
