@@ -3,7 +3,9 @@ local ltask = require "ltask"
 
 local SERVICE_ROOT <const> = 1
 local SERVICE_TIMER <const> = 2
-local SERVICE_GATEWAY <const> = 3
+local SERVICE_DB_MONGO <const> = 3
+local SERVICE_GATEWAY <const> = 4
+
 
 local MESSSAGE_SYSTEM <const> = 0
 local MESSAGE_REQUEST <const> = 1
@@ -54,9 +56,12 @@ end
 
 boot.init_timer()
 exclusive_thread ("timer", SERVICE_TIMER)
-exclusive_thread ("gateway", SERVICE_GATEWAY)
-
+exclusive_thread ("wind/db-mongo", SERVICE_DB_MONGO)
+exclusive_thread ("wind/gateway", SERVICE_GATEWAY)
 bootstrap()	-- launch root
+
+
+
 
 print "ltask Start"
 boot.run()

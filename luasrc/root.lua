@@ -1,6 +1,8 @@
 local ltask = require "ltask"
 local root = require "ltask.root"
 
+local SERVICE_GATEWAY <const> = 4
+
 local config = ...
 
 local S = {}
@@ -24,6 +26,7 @@ end
 -- todo: manage services
 
 local SERVICE_N = 0
+local unique = {}
 
 function S.spawn(name, ...)
 	local address = assert(ltask.post_message(0, 0, config.MESSAGE_SCHEDULE_NEW))
@@ -32,10 +35,21 @@ function S.spawn(name, ...)
 		ltask.post_message(0,address,config.MESSAGE_SCHEDULE_DEL)
 		error(err)
 	end
-	print("SERVICE NEW", address)
+	print("SERVICE NEW", name, address)
 	SERVICE_N = SERVICE_N + 1
 	return address
 end
+
+function S.unique_spawn(name, ...)
+	assert(not unique[name], name)
+	unique[name] = S.spawn(name, ...)
+	return unique[name]
+end
+
+function S.query(name)
+	return unique[name]
+end
+
 
 local function kill(address)
 	if ltask.post_message(0, address, config.MESSAGE_SCHEDULE_HANG) then
@@ -74,11 +88,17 @@ end
 
 local function my_boot()
 	print "Root init"
-	print(os.date("%c", (ltask.now())))
+	S.unique_spawn('wind/logger')
+	S.unique_spawn('wind/eventcenter-manager')
+	S.unique_spawn('wind/uniqueid')
+	
+	local usr = S.spawn('user')
+	S.spawn('test')
+	
+	ltask.call(usr, "ping")
+	ltask.send(SERVICE_GATEWAY, "start")
 
-	-- ltask.timeout(500, function ()
-	-- 	print(ltask.call(3, 'exit'))
-	-- end)
+	S.unique_spawn("wind/logind")
 end
 
 ltask.dispatch(S)

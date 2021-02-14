@@ -209,6 +209,7 @@ local function system(command, filename, ...)
 		local r = f(...)
 		if service == nil then
 			service = r
+			service.WIND_EVENT = ltask.handle_wind_event
 		end
 	else
 		-- todo : other system command
